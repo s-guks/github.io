@@ -129,14 +129,31 @@ function scrollLeftColumnToActiveVerse(id) {
     })
 }
 
-function fillDotColors() {
-    var colorScale = d3.scaleSequential().domain([0,1]).interpolator(d3.interpolateViridis);
-    svg.selectAll("dot")
-        .attr("fill", function (d) {
+function fillDotColors(data) {
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        })]).interpolator(d3.interpolateViridis);
+    svg.selectAll("circle")
+        .style("fill", function (d) {
             {
                 return colorScale(d["Estimated hesitant or unsure"]);
             }
-        })
+        });
+}
+
+function lineOfBestFit(data) {
+    //linearRegression = ƒ(data);
+    linearRegression = d3.regressionLinear()
+        .x(d => d["Social Vulnerability Index (SVI)"])
+        .y(d => d["Percent adults fully vaccinated against COVID-19 (as of 6/10/21)"]);
+    
+    chart.append("g")
+        .append(linearRegression);
 }
 
 function updateDotPlot(data, title = "") {
@@ -159,7 +176,7 @@ function updateDotPlot(data, title = "") {
             return d["Percent adults fully vaccinated against COVID-19 (as of 6/10/21)"];
         })]).range([chartHeight, 10]);
 
-    svg.selectAll("dot")
+    svg.selectAll(".dot")
         .data(data)
         .enter()
         .append("circle")
@@ -200,6 +217,8 @@ function updateDotPlot(data, title = "") {
             .text(title)
             .style("font", "20px");
     }
+    fillDotColors(vaccineHesData);
+    lineOfBestFit(vaccineHesData);
 }
 
 function initializeSVG() {
@@ -242,7 +261,6 @@ async function initialize() {
     await loadData();
     initializeSVG();
     drawKeyframe(keyframeIndex);
-    fillDotColors();
 }
 
 initialize();
