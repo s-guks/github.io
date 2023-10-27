@@ -1,0 +1,137 @@
+/* Resetting some defaults so we can define things manually */
+body,
+h1,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+/* Styling our header */
+header {
+  background-color: darkslateblue;
+  text-align: center;
+  color: white;
+  height: 150px;
+}
+
+.title {
+  padding-top: 30px;
+}
+.author {
+    padding: 10px;
+  }
+
+.wrapper {
+  display: flex; 
+  flex-grow: 1; 
+  min-height: calc(100vh - 200px);
+}
+
+
+.left-column {
+  flex: 1; 
+  background-color: white;
+  color: slateblue;
+  display: flex;
+  /* Position things vertically in the centre */
+  align-items: center;
+  /* Position things horizontally in the centre */
+  justify-content: center;
+  padding: 20px;
+}
+
+.left-column-content {
+  max-height: calc(100vh - 200px);
+  overflow: auto;
+}
+
+.left-column-content::-webkit-scrollbar {
+  height: 0;
+  width: 0;
+}
+
+.right-column {
+  flex: 2; 
+  background-color: lavender;
+  color: darkslateblue;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+footer {
+  position: fixed; /*force the footer to not move regardless of what else is going on on the page*/
+  bottom: 0; /* Make sure it stays at the bottom of the page */
+  background-color: darkslateblue;
+  display: flex; /*need this to be a flex to work with justify-content/align-items*/
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+}
+
+.arrow-button {
+  font-size: 10px;
+  padding: 2px 10px;
+  margin: 0 10px;
+  height: 25px;
+  box-shadow: 0 5px #999;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.arrow-button:hover {
+  color: blueviolet;
+}
+.arrow-button:active {
+  box-shadow: 0 2px #666;
+  transform: translateY(4px);
+}
+
+.verse {
+  font-size: 2em;
+  list-style-type: none;
+  padding: 0px;
+  font-weight: 100;
+  color: #ddd;
+}
+
+svg {
+  background-color: white;
+}
+
+.active-verse {
+  font-weight: 900px;
+  color: lightgray;
+}
+.active-line {
+  color: darkslateblue;
+}
+
+.filler-verse {
+  height: 500px;
+}
+
+/* TODO add css class to make "red" span clickable */
+.red-span {
+  /*cursor: pointer;*/
+}
+
+.purple-span {
+  /*cursor: pointer;*/
+}
+.purple-text {
+  color: purple;
+}
+
+/* TODO add css class to make red-text text red */
+.red-text {
+  color: red;
+}
+.bar:hover {
+  fill-opacity: 50%;
+}
+.red-bar:hover {
+  cursor: pointer;
+}
+
+/* TODO illustrate how to use css classes to interact with d3 elements */

@@ -1,7 +1,85 @@
 <!DOCTYPE html>
 <html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
-</body>
+  <head>
+    <title>Margot's Mother</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1 class="title">Margot’s Mother</h1>
+      <h2 class="author">By Sofia Gukelberger</h2>
+    </header>
+    <main class="wrapper">
+      <div class="left-column">
+        <div class="left-column-content">
+
+          <div class="filler-verse"></div>
+
+          <ul class="verse" id="verse1">
+            <li class="line" id="line1">“It was my time to go,”</span></li>
+            <li class="line" id="line2">Margot’s mother would have said,</li>
+            <li class="line" id="line3">Had she still been alive.</li>
+          </ul>
+
+          <ul class="verse" id="verse2">
+            <li class="line" id="line1">Margot would have nodded</li>
+            <li class="line" id="line2">Clamping shut her lips, and</li>
+            <li class="line" id="line3">Changing the subject.</span></li>
+          </ul>
+
+          <ul class="verse" id="verse3">
+            <li class="line" id="line1">(This is how she always spoke to her mother</li>
+            <li class="line" id="line2">In the months before she died.)</span></li>
+          </ul>
+
+          <ul class="verse" id="verse4">
+            <li class="line" id="line1">Margot would have shoved that disagreement</span></li>
+            <li class="line" id="line2">Down as deep as it would go.</li>
+          </ul>
+
+          <ul class="verse" id="verse5">
+            <li class="line" id="line1">Now, after the funeral,</span></li>
+            <li class="line" id="line2">Margot wondered whether</li>
+            <li class="line" id="line3">She had done the right thing.</li>
+          </ul>
+
+          <ul class="verse" id="verse6">
+            <li class="line" id="line1">If she had disagreed, then maybe,</span></li>
+            <li class="line" id="line2">Would her mother have changed</li>
+            <li class="line" id="line3">Her mind?</li>
+          </ul>
+
+          <ul class="verse" id="verse7">
+            <li class="line" id="line1">Or did those tendrils of rage, of hate,</span></li>
+            <li class="line" id="line2">Of knowing that she knew best,</li>
+            <li class="line" id="line3">Of distrusting reason itself,</li>
+            <li class="line" id="line4">Take root in her mind long before</li>
+            <li class="line" id="line5">Margot even thought to disagree?</li>
+          </ul>
+
+          <ul class="verse" id="verse8">
+            <li class="line" id="line1">Did they make money when they</span></li>
+            <li class="line" id="line2">Told Margot’s mother</li>
+            <li class="line" id="line3">That the cure would kill her?</li>
+          </ul>
+
+          <ul class="verse" id="verse9">
+            <li class="line" id="line1">How much?</span></li>
+          </ul>
+
+          <div class="filler-verse"></div>
+
+        </div>
+      </div>
+      <div class="right-column">
+        <svg id="svg"></svg>
+      </div>
+    </main>
+    <footer>
+      <button class="arrow-button" id="backward-button">◄</button>
+      <button class="arrow-button" id="forward-button">►</button>
+    </footer>
+    <script src="main.js"></script>
+  </body>
 </html>
