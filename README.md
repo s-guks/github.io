@@ -11,4 +11,7 @@ https://d3-graph-gallery.com/graph/custom_color.html
 Line of Best Fit
 https://observablehq.com/@harrystevens/linear-regression
 
+Axis Labels
+https://observablehq.com/@mbostock/the-wealth-health-of-nations
+
 

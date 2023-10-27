@@ -92,7 +92,7 @@ footer {
   list-style-type: none;
   padding: 0px;
   font-weight: 100;
-  color: #ddd;
+  color: lavender;
 }
 
 svg {
@@ -101,7 +101,7 @@ svg {
 
 .active-verse {
   font-weight: 900px;
-  color: lightgray;
+  color: lavender;
 }
 .active-line {
   color: darkslateblue;
