@@ -1,13 +1,14 @@
 # github.io
 
-##How to Run Locally:
+## How to Run Locally:
 
 This program can be run by right-clicking the index.html file and clicking "Open with Live Server."
 
-#Link to visualization: https://s-guks.github.io/
-#Link to code base: https://github.com/s-guks/s-guks.github.io
+# Link to visualization: https://s-guks.github.io/
 
-##Description and Justification of Changes
+# Link to code base: https://github.com/s-guks/s-guks.github.io
+
+## Description and Justification of Changes
 
 I decided to iterate on the static visualizations I designed for M3. I didn’t like how the design on my fifth sheet only displayed some of the data I was interested in. Given both Professor Wall’s and my interest in showing the correlation between social vulnerability and vaccine hesitancy, I decided to include this representation as well as a simplified version of my original design. As my poem is about both COVID-19’s impact on vulnerable populations and about COVID-19 misinformation, I’m happy that I can explore both of these datasets in this project. 
 
@@ -16,7 +17,7 @@ I included a small amount of interactivity in my implementation so the viewer ca
 When the user clicks over to the second verse, the scatterplot is replaced by a pie chart. This pie chart shows the breakdown of relative frequencies of motivations for COVID-19 misinformation attempts. Interactivity includes moving the percentage graph labels to tooltips, and highlighting the different sections of the pie chart according to the user’s place in the poem. 
 
 
-##Tutorials Referenced:
+## Tutorials Referenced:
 
 Scatterplots
 https://d3-graph-gallery.com/graph/scatter_basic.html
