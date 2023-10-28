@@ -6,7 +6,8 @@ let keyframes = [
     },
     {
         activeVerse: 2,
-        activeLines: [1, 2, 3]
+        activeLines: [1, 2, 3],
+        svgUpdate: drawPie
     },
     {
         activeVerse: 3,
@@ -58,7 +59,7 @@ document.getElementById("forward-button").addEventListener("click", forwardClick
 document.getElementById("backward-button").addEventListener("click", backwardClicked);
 
 async function loadData() {
-    await d3.csv("covid-misinfo.csv").then(data => {
+    await d3.csv("covid-misinfo-simple.csv").then(data => {
         misinfoData = data;
     });
     await d3.csv("vaccine-hes.csv").then(data => {
@@ -68,6 +69,10 @@ async function loadData() {
 
 function drawScatterPlot() {
     updateDotPlot(vaccineHesData, "Vaccine Hesitency by County", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19 (as of 6/10/21)")
+}
+
+function drawPie() {
+    makeItAPie(misinfoData, "Motivations for COVID-19 Misinformation");
 }
 
 function forwardClicked() {
@@ -258,6 +263,88 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
 
     fillDotColors(vaccineHesData);
     lineOfBestFit(vaccineHesData);
+}
+
+function makeItAPie(data, title = "") {
+
+    svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+
+    // Define the margin so that there is space around the vis for axes and labels
+    const margin = { top: 30, right: 30, bottom: 50, left: 50 };
+    let chartWidth = width - margin.left - margin.right;
+    let chartHeight = height - margin.top - margin.bottom;
+    var radius = (Math.min(chartWidth, chartHeight)-40) / 2;
+
+    // Create a 'group' variable to hold the chart, these are used to keep similar items together in d3/with svgs
+    let chart = svg.append("g")
+        .attr("transform", "translate(" + (width/2) + "," + 250 + ")");
+
+    var pie = d3.pie()
+        .value(function(d) {
+            return d.Count;
+        });
+      const pieData = pie(data, d => d.Motive);
+     
+      
+    var colorScale = d3.scaleSequential()
+      .domain([0, 8]).interpolator(d3.interpolateViridis);
+
+    chart.selectAll('slices')
+        .data(pieData)
+        .join('path')
+        .attr('d', d3.arc()
+          .innerRadius(0)
+          .outerRadius(radius)
+        )
+        .attr("fill", function (d, i) {
+            return colorScale(i);
+        });
+
+    motives = ["Downplay Severity", "Fear", "False Hope", "Help", "Other", "Politics", "Profit", "Undermine Target Country"]; //data.value(function(d) { return d.Motive });
+    counts = [92, 230, 52, 21, 87, 177, 37, 21]; //data.value(function(d) { return d.Count });
+
+    pos = 315;
+    pos2 = 30;
+    //legend
+    for (i = 0; i < counts.length; i++) {
+    svg.append("circle")
+        .attr("cx", pos2)
+        .attr("cy", pos+20)
+        .attr("r", 6)
+        .attr("fill", colorScale(i));
+        svg.append("text").attr("x", pos2+ 25).attr("y", pos+20).text(motives[i]).style("font-size", "15px").attr("fill", "darkslateblue").attr("alignment-baseline","middle");
+        pos = pos + 20;
+    }
+
+    //labels
+    chart.selectAll('slices')
+        .data(pieData)
+        .join('text')
+        .text(function(d, i) {
+            return (counts[i]);
+        })
+        .attr("transform", function(d) { 
+            return ("translate(" + d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius)
+                .centroid(d) + ")"); 
+        })
+        .style("text-anchor", "middle")
+        .style("font", "14px times")
+        .style("fill", "white");
+
+    // Add title
+    svg.append("text")
+        .transition()
+        .duration(2000)
+        .attr("id", "chart-title")
+        .attr("x", width / 2)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .style("font", "20px times")
+        .style("fill", "darkslateblue")
+        .text(title);
+
 }
 
 function initializeSVG() {
