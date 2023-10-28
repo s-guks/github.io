@@ -321,7 +321,7 @@ function makeItAPie(data, title = "") {
         .data(pieData)
         .join('text')
         .text(function(d, i) {
-            return (counts[i]);
+            return (Math.round((counts[i]/717)*100) + "%");
         })
         .attr("transform", function(d) { 
             return ("translate(" + d3.arc()
@@ -330,7 +330,7 @@ function makeItAPie(data, title = "") {
                 .centroid(d) + ")"); 
         })
         .style("text-anchor", "middle")
-        .style("font", "14px times")
+        .style("font", "12px times")
         .style("fill", "white");
 
     // Add title
