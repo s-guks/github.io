@@ -7,15 +7,17 @@ let keyframes = [
     {
         activeVerse: 2,
         activeLines: [1, 2, 3],
-        svgUpdate: drawPie
+        svgUpdate: fillDotColors
     },
     {
         activeVerse: 3,
-        activeLines: [1, 2]
+        activeLines: [1, 2],
+        svgUpdate:lineOfBestFit
     },
     {
         activeVerse: 4,
-        activeLines: [1, 2]
+        activeLines: [1, 2],
+        svgUpdate:drawPie
     },
     {
         activeVerse: 5,
@@ -55,6 +57,8 @@ let yScale;
 let misinfoData;
 let vaccineHesData;
 
+let isPie;
+
 document.getElementById("forward-button").addEventListener("click", forwardClicked);
 document.getElementById("backward-button").addEventListener("click", backwardClicked);
 
@@ -68,7 +72,7 @@ async function loadData() {
 }
 
 function drawScatterPlot() {
-    updateDotPlot(vaccineHesData, "Vaccine Hesitency by County", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19 (as of 6/10/21)")
+    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19 (as of 6/10/21)")
 }
 
 function drawPie() {
@@ -134,7 +138,8 @@ function scrollLeftColumnToActiveVerse(id) {
     })
 }
 
-function fillDotColors(data) {
+function fillDotColors() {
+    data = vaccineHesData;
     var colorScale = d3.scaleSequential()
         .domain([
             d3.min(data, function (d) {
@@ -151,8 +156,9 @@ function fillDotColors(data) {
         });
 }
 
-function lineOfBestFit(data) {
+function lineOfBestFit() {
     
+    data = vaccineHesData;
     var lineGen = d3.regressionLinear()
         .x(d => d["Social Vulnerability Index (SVI)"])
         .y(d => d["Percent adults fully vaccinated against COVID-19 (as of 6/10/21)"])
@@ -165,6 +171,8 @@ function lineOfBestFit(data) {
         var pointY2 = chartHeight*(lineGen(data)[0][1]);
 
     chart.append("line")
+            .transition()
+            .duration(1000)
             .attr("x1", pointX1)
             .attr("x2", pointX2)
             .attr("y1", pointY1)
@@ -180,7 +188,12 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
     const margin = { top: 50, right: 50, bottom: 30, left: 60 };
     chartWidth = (width - margin.left) - margin.right;
     chartHeight = (height - margin.top) - margin.bottom;
-    
+
+    if (isPie) {   
+        isPie = false; 
+        initializeSVG();
+    }
+
     //define x and y scales
     xScale = d3.scaleLinear()
         .domain([d3.min(data, function (d) {
@@ -200,6 +213,8 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
         .data(data)
         .enter()
         .append("circle")
+        .transition()
+        .duration(1000)
             .attr("cx", function (d) { return (xScale(d["Social Vulnerability Index (SVI)"])+margin.left); } )
             .attr("cy", function (d) { return (yScale(d["Percent adults fully vaccinated against COVID-19 (as of 6/10/21)"])+margin.bottom); } )
             .attr("r", 1.5)
@@ -241,6 +256,8 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
 
     //x-axis label
     svg.append("text")
+        .transition()
+        .duration(1000)
         .attr("class", "x label")
         .attr("text-anchor", "end")
         .attr("x", 475)
@@ -251,6 +268,8 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
     
     //y-axis label
     svg.append("text")
+        .transition()
+        .duration(1000)
         .attr("class", "y label")
         .attr("text-anchor", "end")
         .attr("y", 10)
@@ -260,9 +279,6 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
         .style("font", "15px times")
         .style("fill", "darkslateblue")
         .text(yTitle);
-
-    fillDotColors(vaccineHesData);
-    lineOfBestFit(vaccineHesData);
 }
 
 function makeItAPie(data, title = "") {
@@ -300,8 +316,8 @@ function makeItAPie(data, title = "") {
             return colorScale(i);
         });
 
-    motives = ["Downplay Severity", "Fear", "False Hope", "Help", "Other", "Politics", "Profit", "Undermine Target Country"]; //data.value(function(d) { return d.Motive });
-    counts = [92, 230, 52, 21, 87, 177, 37, 21]; //data.value(function(d) { return d.Count });
+    motives = ["Fear", "Politics", "Downplay Severity", "Other", "False Hope", "Profit", "Help", "Undermine Target Country"]; //data.value(function(d) { return d.Motive });
+    counts = [230, 177, 92, 87, 52, 37, 21, 21]; //data.value(function(d) { return d.Count });
 
     pos = 315;
     pos2 = 30;
@@ -345,13 +361,16 @@ function makeItAPie(data, title = "") {
         .style("fill", "darkslateblue")
         .text(title);
 
+
+    
+    isPie = true;
 }
 
 function initializeSVG() {
     svg.attr("width", width);
     svg.attr("height", height);
 
-    svg.selectAll("*").remove();
+    svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 
     const margin = { top: 30, right: 30, bottom: 50, left: 50 };
     chartWidth = width - margin.left - margin.right;
