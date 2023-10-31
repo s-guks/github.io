@@ -362,7 +362,6 @@ function makeItAPie(data, title = "") {
         .text(title);
 
 
-    
     isPie = true;
 }
 
