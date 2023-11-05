@@ -17,15 +17,17 @@ let keyframes = [
     {
         activeVerse: 4,
         activeLines: [1, 2],
-        svgUpdate:drawPie
+        svgUpdate: fillVeryHesitant
     },
     {
         activeVerse: 5,
-        activeLines: [1, 2, 3]
+        activeLines: [1, 2, 3],
+        svgUpdate: fillModHesitant
     },
     {
         activeVerse: 6,
-        activeLines: [1, 2, 3]
+        activeLines: [1, 2, 3],
+        svgUpdate: fillLowHesitant
     },
     {
         activeVerse: 7,
@@ -33,7 +35,8 @@ let keyframes = [
     },
     {
         activeVerse: 8,
-        activeLines: [1, 2, 3]
+        activeLines: [1, 2, 3],
+        svgUpdate:drawPie
     },
     {
         activeVerse: 9,
@@ -154,6 +157,141 @@ function fillDotColors() {
                 return colorScale(d["Estimated hesitant or unsure"]);
             }
         });
+}
+
+function fillVeryHesitant() {
+    data = vaccineHesData;
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        })]).interpolator(d3.interpolateViridis);
+    var colorScale2 = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        })]).range([0, 100]);
+    svg.selectAll("circle")
+        .style("fill", function (d) {
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f >= 66) {
+                    return colorScale(d["Estimated hesitant or unsure"]);
+                }
+                else {
+                    return "lightgray";
+                }
+            }
+        })
+        .attr("r", function (d){
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f >= 66) {
+                    return 2;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+
+    svg.selectAll("line").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+}
+
+function fillModHesitant() {
+    data = vaccineHesData;
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        })]).interpolator(d3.interpolateViridis);
+    var colorScale2 = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        })]).range([0, 100]);
+    svg.selectAll("circle")
+        .style("fill", function (d) {
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f < 66 && f > 33) {
+                    return colorScale(d["Estimated hesitant or unsure"]);
+                }
+                else {
+                    return "lightgray";
+                }
+            }
+        })
+        .attr("r", function (d){
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f < 66 && f > 33) {
+                    return 2;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+
+    svg.selectAll("line").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+}
+
+function fillLowHesitant() {
+    data = vaccineHesData;
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        })]).interpolator(d3.interpolateViridis);
+    var colorScale2 = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+        })]).range([0, 100]);
+    svg.selectAll("circle")
+        .style("fill", function (d) {
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f <= 33) {
+                    return colorScale(d["Estimated hesitant or unsure"]);
+                }
+                else {
+                    return "lightgray";
+                }
+            }
+        })
+        .attr("r", function (d){
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f <= 33) {
+                    return 2;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+
+    svg.selectAll("line").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
 function lineOfBestFit() {

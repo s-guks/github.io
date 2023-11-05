@@ -112,9 +112,10 @@ svg {
 }
 
 .rage:hover {
-  cursor: pointer;
+  color: red;
 }
 
+/*
 .rage a:hover {
   animation: shake 1s infinite;
   animation-timing-function: linear; 
@@ -125,11 +126,13 @@ svg {
   50% { transform: translate(-2px, 0); }
   100% { transform: translate(2px, 0); }
 }
+*/
 
 .hate:hover {
-  cursor: pointer;
+  color: red;
 }
 
+/*
 .hate a:hover {
   animation: shake2 1s infinite;
   animation-timing-function: linear; 
@@ -140,6 +143,7 @@ svg {
   50% { transform: rotate(-0.5deg); }
   100% { transform: rotate(0.5deg); }
 }
+*/
 
 /* TODO add css class to make "red" span clickable */
 .red-span {
