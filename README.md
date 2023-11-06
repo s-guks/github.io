@@ -10,7 +10,7 @@ This program can be run by right-clicking the index.html file and clicking "Open
 
 ## Description of Interactivity
 
-This data visualization's interactivity is controlled by the arrows on the bottom. Clicking the forward arrow scrolls through the poem, updates the chart, and updates the description text in the right column. 
+This data visualization's interactivity is controlled by the arrows on the bottom. Clicking the forward arrow scrolls through the poem, updates the chart, and updates the description text in the right column. Using the back arrow scrolls back in the poem, updates the description text, and reverts the chart to its previous state (or a state that makes sense at every stage). Hovering over "rage" and "hate" causes these words to turn red. 
 
 ## Description and Justification of Changes
 

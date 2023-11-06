@@ -145,7 +145,7 @@ svg {
 }
 
 .rage:hover {
-  color: red;
+  color: darkred;
 }
 
 /*
@@ -162,7 +162,7 @@ svg {
 */
 
 .hate:hover {
-  color: red;
+  color: darkred;
 }
 
 /*
@@ -177,26 +177,3 @@ svg {
   100% { transform: rotate(0.5deg); }
 }
 */
-
-/* TODO add css class to make "red" span clickable */
-.red-span {
-  /*cursor: pointer;*/
-}
-
-.purple-span {
-  /*cursor: pointer;*/
-}
-.purple-text {
-  color: purple;
-}
-
-/* TODO add css class to make red-text text red */
-.red-text {
-  color: red;
-}
-.bar:hover {
-  fill-opacity: 50%;
-}
-.red-bar:hover {
-  cursor: pointer;
-}
