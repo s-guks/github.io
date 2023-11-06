@@ -8,6 +8,10 @@ This program can be run by right-clicking the index.html file and clicking "Open
 
 # Link to code base: https://github.com/s-guks/s-guks.github.io
 
+## Description of Interactivity
+
+This data visualization's interactivity is controlled by the arrows on the bottom. Clicking the forward arrow scrolls through the poem, updates the chart, and updates the description text in the right column. 
+
 ## Description and Justification of Changes
 
 I decided to iterate on the static visualizations I designed for M3. I didn’t like how the design on my fifth sheet only displayed some of the data I was interested in. Given both Professor Wall’s and my interest in showing the correlation between social vulnerability and vaccine hesitancy, I decided to include this representation as well as a simplified version of my original design. As my poem is about both COVID-19’s impact on vulnerable populations and about COVID-19 misinformation, I’m happy that I can explore both of these datasets in this project. 

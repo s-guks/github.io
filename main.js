@@ -39,7 +39,7 @@ let keyframes = [
         activeVerse: 7,
         activeLines: [1, 2, 3, 4, 5],
         activeText: 7,
-        svgUpdate:drawPie
+        svgUpdate: drawPie
     },
     {
         activeVerse: 8,
@@ -70,6 +70,8 @@ let misinfoData;
 let vaccineHesData;
 
 let isPie;
+let isVeryHes;
+let scaleExists = false;
 
 document.getElementById("forward-button").addEventListener("click", forwardClicked);
 document.getElementById("backward-button").addEventListener("click", backwardClicked);
@@ -92,8 +94,17 @@ function drawPie() {
 }
 
 function fillDotAndLine() {
-    fillDotColors();
-    lineOfBestFit();
+    if(isPie) {
+        //drawScatterPlot();
+        //setTimeout(() =>{fillDotColors()}, "1000");
+        setTimeout(() =>{lineOfBestFit()}, "1000");
+    }
+    else {
+        //drawScatterPlot();
+        //setTimeout(() =>{fillDotColors()}, "500");
+        setTimeout(() =>{lineOfBestFit()}, "500");
+    }
+    
 }
 
 function forwardClicked() {
@@ -198,6 +209,7 @@ function fillDotColors() {
         })
         .attr("r", 1.5);
         
+    if (!scaleExists) {
     
         const defs = svg.append("defs");
   
@@ -252,7 +264,11 @@ function fillDotColors() {
         .style("font", "15px times")
         .style("fill", "darkslateblue")
         .text("32%");
+        
+        scaleExists = true;
+    }
 
+    
 }
 
 function fillVeryHesitant() {
@@ -297,6 +313,7 @@ function fillVeryHesitant() {
             }
         });
 
+        isVeryHes = true;
         svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
@@ -391,6 +408,13 @@ function fillLowHesitant() {
 }
 
 function lineOfBestFit() {
+
+    if (isVeryHes) {
+        drawScatterPlot();
+        setTimeout(() =>{fillDotColors()}, "1000");
+        //setTimeout(() =>{lineOfBestFit()}, "1000");
+        veryHes = false;
+    }
     
     data = vaccineHesData;
     var lineGen = d3.regressionLinear()
@@ -424,10 +448,14 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
     chartWidth = (width - margin.left) - margin.right;
     chartHeight = (height - margin.top) - margin.bottom -100;
 
+    //svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+    
     if (isPie) {   
         isPie = false; 
+        svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
         initializeSVG();
     }
+
 
     //define x and y scales
     xScale = d3.scaleLinear()
@@ -514,7 +542,7 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
         .attr("transform", "rotate(-90)")
         .style("font", "15px times")
         .style("fill", "darkslateblue")
-        .text(yTitle);        
+        .text(yTitle);
 
 }
 
@@ -600,6 +628,7 @@ function makeItAPie(data, title = "") {
 
 
     isPie = true;
+    scaleExists = false;
 }
 
 function initializeSVG() {
@@ -609,8 +638,8 @@ function initializeSVG() {
     svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 
     const margin = { top: 30, right: 30, bottom: 50, left: 50 };
-    chartWidth = width - margin.left - margin.right;
-    chartHeight = height - margin.top - margin.bottom;
+    //chartWidth = width - margin.left - margin.right;
+    //chartHeight = height - margin.top - margin.bottom;
 
     chart = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
