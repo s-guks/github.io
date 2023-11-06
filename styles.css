@@ -50,13 +50,33 @@ header {
   width: 0;
 }
 
-.right-column {
+.mid-column {
   flex: 2; 
   background-color: lavender;
   color: darkslateblue;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.right-column {
+  flex: 1; 
+  background-color: white;
+  color: slateblue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.right-column-content {
+  max-height: calc(100vh - 200px);
+  overflow: auto;
+}
+
+.right-column-content::-webkit-scrollbar {
+  height: 0;
+  width: 0;
 }
 
 footer {
@@ -93,6 +113,19 @@ footer {
   padding: 0px;
   font-weight: 100;
   color: lavender;
+}
+
+.text {
+  font-size: 2em;
+  list-style-type: none;
+  padding: 0px;
+  font-weight: 100;
+  visibility: hidden;
+}
+.active-text {
+  font-weight: 900px;
+  color: darkslateblue;
+  visibility: visible;
 }
 
 svg {
@@ -167,5 +200,3 @@ svg {
 .red-bar:hover {
   cursor: pointer;
 }
-
-/* TODO illustrate how to use css classes to interact with d3 elements */

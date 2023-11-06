@@ -2,52 +2,61 @@ let keyframes = [
     {
         activeVerse: 1,
         activeLines: [1, 2, 3],
+        activeText: 1,
         svgUpdate: drawScatterPlot
     },
     {
         activeVerse: 2,
         activeLines: [1, 2, 3],
+        activeText: 2,
         svgUpdate: fillDotColors
     },
     {
         activeVerse: 3,
         activeLines: [1, 2],
+        activeText: 3,
         svgUpdate:lineOfBestFit
     },
     {
         activeVerse: 4,
         activeLines: [1, 2],
+        activeText: 4,
         svgUpdate: fillVeryHesitant
     },
     {
         activeVerse: 5,
         activeLines: [1, 2, 3],
-        svgUpdate: fillModHesitant
+        activeText: 5,
+        svgUpdate: fillLowHesitant
     },
     {
         activeVerse: 6,
         activeLines: [1, 2, 3],
-        svgUpdate: fillLowHesitant
+        activeText: 6,
+        svgUpdate: fillDotAndLine
     },
     {
         activeVerse: 7,
-        activeLines: [1, 2, 3, 4, 5]
+        activeLines: [1, 2, 3, 4, 5],
+        activeText: 7,
+        svgUpdate:drawPie
     },
     {
         activeVerse: 8,
         activeLines: [1, 2, 3],
-        svgUpdate:drawPie
+        activeText: 8
     },
     {
         activeVerse: 9,
-        activeLines: [1]
+        activeLines: [1],
+        activeText: 9
     }
 ]
 
 let svg = d3.select("#svg");
 let keyframeIndex = 0;
 
-const width = 750;
+const width = 600;
 const height = 500;
 
 let chart;
@@ -75,11 +84,16 @@ async function loadData() {
 }
 
 function drawScatterPlot() {
-    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19 (as of 6/10/21)")
+    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19")
 }
 
 function drawPie() {
     makeItAPie(misinfoData, "Motivations for COVID-19 Misinformation");
+}
+
+function fillDotAndLine() {
+    fillDotColors();
+    lineOfBestFit();
 }
 
 function forwardClicked() {
@@ -100,6 +114,7 @@ function drawKeyframe(kfi) {
     let kf = keyframes[kfi];
     resetActiveLines();
     updateActiveVerse(kf.activeVerse);
+    updateActiveText(kf.activeText);
     for (line of kf.activeLines){
         updateActiveLine(kf.activeVerse, line);  
     }
@@ -119,9 +134,33 @@ function updateActiveVerse(id) {
     scrollLeftColumnToActiveVerse(id);
 }
 
+function updateActiveText(id) {
+    d3.selectAll(".text").classed("active-text", false);
+    d3.select("#text"+id).classed("active-text", true);
+
+    scrollRightColumnToActiveText(id);
+}
+
 function updateActiveLine(vid, lid) {
     let thisVerse = d3.select("#verse" + vid);
     thisVerse.select("#line" + lid).classed("active-line", true);
+}
+
+function scrollRightColumnToActiveText(id) {
+
+    var rightColumn = document.querySelector(".right-column-content");
+
+    var activeText = document.getElementById("text" + id);
+
+    var textRect = activeText.getBoundingClientRect();
+    var rightColumnRect = rightColumn.getBoundingClientRect();
+
+    var desiredScrollTop = textRect.top + rightColumn.scrollTop - rightColumnRect.top - (rightColumnRect.height - textRect.height) / 2;
+
+    rightColumn.scrollTo({
+        top: desiredScrollTop,
+        behavior: 'smooth'
+    })
 }
 
 function scrollLeftColumnToActiveVerse(id) {
@@ -156,7 +195,64 @@ function fillDotColors() {
             {
                 return colorScale(d["Estimated hesitant or unsure"]);
             }
-        });
+        })
+        .attr("r", 1.5);
+        
+    
+        const defs = svg.append("defs");
+  
+        const linearGradient = defs.append("linearGradient")
+            .attr("id", "linear-gradient");
+        
+        linearGradient.selectAll("stop")
+          .data(colorScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: colorScale(t) })))
+          .enter().append("stop")
+          .attr("offset", d => d.offset)
+          .attr("stop-color", d => d.color);
+    
+    svg.append("g")
+        .append("rect")
+        .attr("x", 20)
+        .attr("y", 430)
+        .transition()
+        .duration(1000)
+        .attr("width", width-40)
+        .attr("height", "30px")
+        .style("fill", "url(#linear-gradient)");
+
+    svg.append("text")
+        .transition()
+        .duration(1000)
+        .attr("class", "scale label")
+        .attr("text-anchor", "end")
+        .attr("x", 275)
+        .attr("y", chartHeight + 100)
+        .style("font", "15px times")
+        .style("fill", "darkslateblue")
+        .text("Percent Hesitant or Unsure of Vaccination");
+
+    svg.append("text")
+        .transition()
+        .duration(1000)
+        .attr("class", "minScale")
+        .attr("text-anchor", "end")
+        .attr("x", 60)
+        .attr("y", chartHeight + 160)
+        .style("font", "15px times")
+        .style("fill", "darkslateblue")
+        .text("0.05%");
+    
+    svg.append("text")
+        .transition()
+        .duration(1000)
+        .attr("class", "maxScale")
+        .attr("text-anchor", "end")
+        .attr("x", 578)
+        .attr("y", chartHeight + 160)
+        .style("font", "15px times")
+        .style("fill", "darkslateblue")
+        .text("32%");
+
 }
 
 function fillVeryHesitant() {
@@ -201,7 +297,7 @@ function fillVeryHesitant() {
             }
         });
 
-    svg.selectAll("line").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
 function fillModHesitant() {
@@ -246,7 +342,7 @@ function fillModHesitant() {
             }
         });
 
-    svg.selectAll("line").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
 function fillLowHesitant() {
@@ -291,7 +387,7 @@ function fillLowHesitant() {
             }
         });
 
-    svg.selectAll("line").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
 function lineOfBestFit() {
@@ -315,9 +411,10 @@ function lineOfBestFit() {
             .attr("x2", pointX2)
             .attr("y1", pointY1)
             .attr("y2", pointY2)
+            .attr("class", "bestFitLine")
             .attr("stroke", "darkslateblue")
             .attr("stroke-width", "2px")
-            .attr("transform", `translate(10, 95)`);
+            .attr("transform", `translate(10, 75)`);
 }
 
 function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
@@ -325,7 +422,7 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
     //margin
     const margin = { top: 50, right: 50, bottom: 30, left: 60 };
     chartWidth = (width - margin.left) - margin.right;
-    chartHeight = (height - margin.top) - margin.bottom;
+    chartHeight = (height - margin.top) - margin.bottom -100;
 
     if (isPie) {   
         isPie = false; 
@@ -389,7 +486,7 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
             .transition()
             .duration(1000)
             .text(title)
-            .style("font", "20px times");
+            .style("font", "19px times");
     }
 
     //x-axis label
@@ -398,11 +495,12 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
         .duration(1000)
         .attr("class", "x label")
         .attr("text-anchor", "end")
-        .attr("x", 475)
-        .attr("y", height - 10)
+        .attr("x", 400)
+        .attr("y", chartHeight + 70)
         .style("font", "15px times")
         .style("fill", "darkslateblue")
         .text(xTitle);
+
     
     //y-axis label
     svg.append("text")
@@ -416,7 +514,8 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
         .attr("transform", "rotate(-90)")
         .style("font", "15px times")
         .style("fill", "darkslateblue")
-        .text(yTitle);
+        .text(yTitle);        
+
 }
 
 function makeItAPie(data, title = "") {
@@ -425,13 +524,13 @@ function makeItAPie(data, title = "") {
 
     // Define the margin so that there is space around the vis for axes and labels
     const margin = { top: 30, right: 30, bottom: 50, left: 50 };
-    let chartWidth = width - margin.left - margin.right;
-    let chartHeight = height - margin.top - margin.bottom;
-    var radius = (Math.min(chartWidth, chartHeight)-40) / 2;
+    let chartWidth1 = width - margin.left - margin.right;
+    let chartHeight2 = height - margin.top - margin.bottom;
+    var radius = (Math.min(chartWidth1, chartHeight2)-40) / 2;
 
     // Create a 'group' variable to hold the chart, these are used to keep similar items together in d3/with svgs
     let chart = svg.append("g")
-        .attr("transform", "translate(" + (width/2) + "," + 250 + ")");
+        .attr("transform", "translate(" + (width/2 +40) + "," + 250 + ")");
 
     var pie = d3.pie()
         .value(function(d) {
@@ -457,8 +556,8 @@ function makeItAPie(data, title = "") {
     motives = ["Fear", "Politics", "Downplay Severity", "Other", "False Hope", "Profit", "Help", "Undermine Target Country"]; //data.value(function(d) { return d.Motive });
     counts = [230, 177, 92, 87, 52, 37, 21, 21]; //data.value(function(d) { return d.Count });
 
-    pos = 315;
-    pos2 = 30;
+    pos = 215+100;
+    pos2 = 20;
     //legend
     for (i = 0; i < counts.length; i++) {
     svg.append("circle")
