@@ -3,7 +3,7 @@ let keyframes = [
         activeVerse: 1,
         activeLines: [1, 2, 3],
         activeText: 1,
-        svgUpdate: drawScatterPlot
+        svgUpdate: drawScatterPlotInitial
     },
     {
         activeVerse: 2,
@@ -71,6 +71,7 @@ let vaccineHesData;
 
 let isPie;
 let isVeryHes;
+let bestFitExists;
 let scaleExists = false;
 
 document.getElementById("forward-button").addEventListener("click", forwardClicked);
@@ -85,23 +86,33 @@ async function loadData() {
     });
 }
 
+function drawScatterPlotInitial() {
+    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19");
+    if (scaleExists) {
+        svg.selectAll(".colorLegend").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+        scaleExists = false;
+    }
+}
+
 function drawScatterPlot() {
-    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19")
+    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19");
 }
 
 function drawPie() {
-    makeItAPie(misinfoData, "Motivations for COVID-19 Misinformation");
+    if (!isPie) {
+        makeItAPie(misinfoData, "Motivations for COVID-19 Misinformation");
+    }
 }
 
 function fillDotAndLine() {
     if(isPie) {
-        //drawScatterPlot();
-        //setTimeout(() =>{fillDotColors()}, "1000");
+        drawScatterPlot();
+        setTimeout(() =>{fillDotColors()}, "1000");
         setTimeout(() =>{lineOfBestFit()}, "1000");
     }
     else {
         //drawScatterPlot();
-        //setTimeout(() =>{fillDotColors()}, "500");
+        setTimeout(() =>{fillDotColors()}, "500");
         setTimeout(() =>{lineOfBestFit()}, "500");
     }
     
@@ -202,6 +213,7 @@ function fillDotColors() {
                 return d["Estimated hesitant or unsure"];
         })]).interpolator(d3.interpolateViridis);
     svg.selectAll("circle")
+        .transition().duration(1000)
         .style("fill", function (d) {
             {
                 return colorScale(d["Estimated hesitant or unsure"]);
@@ -226,6 +238,7 @@ function fillDotColors() {
         .append("rect")
         .attr("x", 20)
         .attr("y", 430)
+        .attr("class", "colorLegend")
         .transition()
         .duration(1000)
         .attr("width", width-40)
@@ -235,18 +248,18 @@ function fillDotColors() {
     svg.append("text")
         .transition()
         .duration(1000)
-        .attr("class", "scale label")
+        .attr("class", "colorLegend")
         .attr("text-anchor", "end")
-        .attr("x", 275)
+        .attr("x", 338)
         .attr("y", chartHeight + 100)
         .style("font", "15px times")
         .style("fill", "darkslateblue")
-        .text("Percent Hesitant or Unsure of Vaccination");
+        .text("Percent of County Hesitant or Unsure of Vaccination");
 
     svg.append("text")
         .transition()
         .duration(1000)
-        .attr("class", "minScale")
+        .attr("class", "colorLegend")
         .attr("text-anchor", "end")
         .attr("x", 60)
         .attr("y", chartHeight + 160)
@@ -257,7 +270,7 @@ function fillDotColors() {
     svg.append("text")
         .transition()
         .duration(1000)
-        .attr("class", "maxScale")
+        .attr("class", "colorLegend")
         .attr("text-anchor", "end")
         .attr("x", 578)
         .attr("y", chartHeight + 160)
@@ -268,6 +281,10 @@ function fillDotColors() {
         scaleExists = true;
     }
 
+    if (bestFitExists && keyframeIndex == 1) {
+        bestFitExists = false;
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+    }
     
 }
 
@@ -290,6 +307,7 @@ function fillVeryHesitant() {
                 return d["Estimated hesitant or unsure"];
         })]).range([0, 100]);
     svg.selectAll("circle")
+        .transition().duration(1000)
         .style("fill", function (d) {
             {
                 let f = colorScale2(d["Estimated hesitant or unsure"])
@@ -301,6 +319,7 @@ function fillVeryHesitant() {
                 }
             }
         })
+        .transition().duration(1000)
         .attr("r", function (d){
             {
                 let f = colorScale2(d["Estimated hesitant or unsure"])
@@ -314,6 +333,7 @@ function fillVeryHesitant() {
         });
 
         isVeryHes = true;
+        bestFitExists = false;
         svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
@@ -359,6 +379,7 @@ function fillModHesitant() {
             }
         });
 
+        bestFitExists = false;
         svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
@@ -381,6 +402,7 @@ function fillLowHesitant() {
                 return d["Estimated hesitant or unsure"];
         })]).range([0, 100]);
     svg.selectAll("circle")
+        .transition().duration(1000)
         .style("fill", function (d) {
             {
                 let f = colorScale2(d["Estimated hesitant or unsure"])
@@ -392,6 +414,7 @@ function fillLowHesitant() {
                 }
             }
         })
+        .transition().duration(1000)
         .attr("r", function (d){
             {
                 let f = colorScale2(d["Estimated hesitant or unsure"])
@@ -404,6 +427,7 @@ function fillLowHesitant() {
             }
         });
 
+        bestFitExists = false;
         svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
 }
 
@@ -413,7 +437,7 @@ function lineOfBestFit() {
         drawScatterPlot();
         setTimeout(() =>{fillDotColors()}, "1000");
         //setTimeout(() =>{lineOfBestFit()}, "1000");
-        veryHes = false;
+        isVeryHes = false;
     }
     
     data = vaccineHesData;
@@ -439,6 +463,8 @@ function lineOfBestFit() {
             .attr("stroke", "darkslateblue")
             .attr("stroke-width", "2px")
             .attr("transform", `translate(10, 75)`);
+    
+    bestFitExists = true;
 }
 
 function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
@@ -547,8 +573,11 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
 }
 
 function makeItAPie(data, title = "") {
+    setTimeout(() =>{makePie(data, title)}, "1000");
+    svg.selectAll("*").transition().attr("transform", "translate(0, 1000)").duration(900).remove();
+}
 
-    svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+function makePie(data, title = "") {
 
     // Define the margin so that there is space around the vis for axes and labels
     const margin = { top: 30, right: 30, bottom: 50, left: 50 };
@@ -588,19 +617,32 @@ function makeItAPie(data, title = "") {
     pos2 = 20;
     //legend
     for (i = 0; i < counts.length; i++) {
-    svg.append("circle")
-        .attr("cx", pos2)
-        .attr("cy", pos+20)
-        .attr("r", 6)
-        .attr("fill", colorScale(i));
-        svg.append("text").attr("x", pos2+ 25).attr("y", pos+20).text(motives[i]).style("font-size", "15px").attr("fill", "darkslateblue").attr("alignment-baseline","middle");
-        pos = pos + 20;
+        svg.append("circle")
+            .transition()
+            .duration(1000)
+            .attr("cx", pos2)
+            .attr("cy", pos+20)
+            .attr("r", 6)
+            .attr("fill", colorScale(i));
+        
+        svg.append("text")
+            .transition()
+            .duration(1000)
+            .attr("x", pos2+ 25)
+            .attr("y", pos+20)
+            .text(motives[i])
+            .style("font-size", "15px")
+            .attr("fill", "darkslateblue")
+            .attr("alignment-baseline","middle");
+            pos = pos + 20;
     }
 
     //labels
     chart.selectAll('slices')
         .data(pieData)
         .join('text')
+        .transition()
+        .duration(1000)
         .text(function(d, i) {
             return (Math.round((counts[i]/717)*100) + "%");
         })
