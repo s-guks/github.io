@@ -1,3 +1,7 @@
+
+//FUNCTIONS THAT MAKE THE WEBSITE WORK
+
+//keyframes: these hold the active verse/lines, and the SVG updates
 let keyframes = [
     {
         activeVerse: 1,
@@ -74,49 +78,9 @@ let isVeryHes;
 let bestFitExists;
 let scaleExists = false;
 
+//forward/back buttons
 document.getElementById("forward-button").addEventListener("click", forwardClicked);
 document.getElementById("backward-button").addEventListener("click", backwardClicked);
-
-async function loadData() {
-    await d3.csv("covid-misinfo-simple.csv").then(data => {
-        misinfoData = data;
-    });
-    await d3.csv("vaccine-hes.csv").then(data => {
-        vaccineHesData = data;
-    });
-}
-
-function drawScatterPlotInitial() {
-    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19");
-    if (scaleExists) {
-        svg.selectAll(".colorLegend").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
-        scaleExists = false;
-    }
-}
-
-function drawScatterPlot() {
-    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19");
-}
-
-function drawPie() {
-    if (!isPie) {
-        makeItAPie(misinfoData, "Motivations for COVID-19 Misinformation");
-    }
-}
-
-function fillDotAndLine() {
-    if(isPie) {
-        drawScatterPlot();
-        setTimeout(() =>{fillDotColors()}, "1000");
-        setTimeout(() =>{lineOfBestFit()}, "1000");
-    }
-    else {
-        //drawScatterPlot();
-        setTimeout(() =>{fillDotColors()}, "500");
-        setTimeout(() =>{lineOfBestFit()}, "500");
-    }
-    
-}
 
 function forwardClicked() {
     if (keyframeIndex < keyframes.length - 1) {
@@ -132,6 +96,17 @@ function backwardClicked() {
       }
 }
 
+//load data from CSV files
+async function loadData() {
+    await d3.csv("covid-misinfo-simple.csv").then(data => {
+        misinfoData = data;
+    });
+    await d3.csv("vaccine-hes.csv").then(data => {
+        vaccineHesData = data;
+    });
+}
+
+//update the SVG based on active keyframe
 function drawKeyframe(kfi) {
     let kf = keyframes[kfi];
     resetActiveLines();
@@ -156,16 +131,16 @@ function updateActiveVerse(id) {
     scrollLeftColumnToActiveVerse(id);
 }
 
+function updateActiveLine(vid, lid) {
+    let thisVerse = d3.select("#verse" + vid);
+    thisVerse.select("#line" + lid).classed("active-line", true);
+}
+
 function updateActiveText(id) {
     d3.selectAll(".text").classed("active-text", false);
     d3.select("#text"+id).classed("active-text", true);
 
     scrollRightColumnToActiveText(id);
-}
-
-function updateActiveLine(vid, lid) {
-    let thisVerse = d3.select("#verse" + vid);
-    thisVerse.select("#line" + lid).classed("active-line", true);
 }
 
 function scrollRightColumnToActiveText(id) {
@@ -202,271 +177,87 @@ function scrollLeftColumnToActiveVerse(id) {
     })
 }
 
-function fillDotColors() {
-    data = vaccineHesData;
-    var colorScale = d3.scaleSequential()
-        .domain([
-            d3.min(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        }), 
-            d3.max(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        })]).interpolator(d3.interpolateViridis);
-    svg.selectAll("circle")
-        .transition().duration(1000)
-        .style("fill", function (d) {
-            {
-                return colorScale(d["Estimated hesitant or unsure"]);
-            }
-        })
-        .attr("r", 1.5);
-        
-    if (!scaleExists) {
-    
-        const defs = svg.append("defs");
-  
-        const linearGradient = defs.append("linearGradient")
-            .attr("id", "linear-gradient");
-        
-        linearGradient.selectAll("stop")
-          .data(colorScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: colorScale(t) })))
-          .enter().append("stop")
-          .attr("offset", d => d.offset)
-          .attr("stop-color", d => d.color);
-    
-    svg.append("g")
-        .append("rect")
-        .attr("x", 20)
-        .attr("y", 430)
-        .attr("class", "colorLegend")
-        .transition()
-        .duration(1000)
-        .attr("width", width-40)
-        .attr("height", "30px")
-        .style("fill", "url(#linear-gradient)");
+//FUNCTIONS THAT MANIPULATE THE GRAPHS BETWEEN KEYFRAMES
 
-    svg.append("text")
-        .transition()
-        .duration(1000)
-        .attr("class", "colorLegend")
-        .attr("text-anchor", "end")
-        .attr("x", 338)
-        .attr("y", chartHeight + 100)
-        .style("font", "15px times")
-        .style("fill", "darkslateblue")
-        .text("Percent of County Hesitant or Unsure of Vaccination");
-
-    svg.append("text")
-        .transition()
-        .duration(1000)
-        .attr("class", "colorLegend")
-        .attr("text-anchor", "end")
-        .attr("x", 60)
-        .attr("y", chartHeight + 160)
-        .style("font", "15px times")
-        .style("fill", "darkslateblue")
-        .text("0.05%");
-    
-    svg.append("text")
-        .transition()
-        .duration(1000)
-        .attr("class", "colorLegend")
-        .attr("text-anchor", "end")
-        .attr("x", 578)
-        .attr("y", chartHeight + 160)
-        .style("font", "15px times")
-        .style("fill", "darkslateblue")
-        .text("32%");
-        
-        scaleExists = true;
+//draw different versions of the graphs based on the keyframe
+function drawScatterPlotInitial() {
+    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19");
+    if (scaleExists) {
+        svg.selectAll(".colorLegend").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+        scaleExists = false;
     }
+}
 
-    if (bestFitExists && keyframeIndex == 1) {
-        bestFitExists = false;
-        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+function drawScatterPlot() {
+    updateDotPlot(vaccineHesData, "Percent of Adults Vaccinated Vs. Social Vulnerability in the United States", "Social Vulnerability Index (SVI)", "Percent adults fully vaccinated against COVID-19");
+}
+
+function drawPie() {
+    if (!isPie) {
+        makeItAPie(misinfoData, "Motivations for COVID-19 Misinformation");
     }
-    
 }
 
-function fillVeryHesitant() {
-    data = vaccineHesData;
-    var colorScale = d3.scaleSequential()
-        .domain([
-            d3.min(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        }), 
-            d3.max(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        })]).interpolator(d3.interpolateViridis);
-    var colorScale2 = d3.scaleSequential()
-        .domain([
-            d3.min(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        }), 
-            d3.max(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        })]).range([0, 100]);
-    svg.selectAll("circle")
-        .transition().duration(1000)
-        .style("fill", function (d) {
-            {
-                let f = colorScale2(d["Estimated hesitant or unsure"])
-                if (f >= 66) {
-                    return colorScale(d["Estimated hesitant or unsure"]);
-                }
-                else {
-                    return "lightgray";
-                }
-            }
-        })
-        .transition().duration(1000)
-        .attr("r", function (d){
-            {
-                let f = colorScale2(d["Estimated hesitant or unsure"])
-                if (f >= 66) {
-                    return 2;
-                }
-                else {
-                    return 0;
-                }
-            }
-        });
-
-        isVeryHes = true;
-        bestFitExists = false;
-        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
-}
-
-function fillModHesitant() {
-    data = vaccineHesData;
-    var colorScale = d3.scaleSequential()
-        .domain([
-            d3.min(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        }), 
-            d3.max(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        })]).interpolator(d3.interpolateViridis);
-    var colorScale2 = d3.scaleSequential()
-        .domain([
-            d3.min(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        }), 
-            d3.max(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        })]).range([0, 100]);
-    svg.selectAll("circle")
-        .style("fill", function (d) {
-            {
-                let f = colorScale2(d["Estimated hesitant or unsure"])
-                if (f < 66 && f > 33) {
-                    return colorScale(d["Estimated hesitant or unsure"]);
-                }
-                else {
-                    return "lightgray";
-                }
-            }
-        })
-        .attr("r", function (d){
-            {
-                let f = colorScale2(d["Estimated hesitant or unsure"])
-                if (f < 66 && f > 33) {
-                    return 2;
-                }
-                else {
-                    return 0;
-                }
-            }
-        });
-
-        bestFitExists = false;
-        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
-}
-
-function fillLowHesitant() {
-    data = vaccineHesData;
-    var colorScale = d3.scaleSequential()
-        .domain([
-            d3.min(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        }), 
-            d3.max(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        })]).interpolator(d3.interpolateViridis);
-    var colorScale2 = d3.scaleSequential()
-        .domain([
-            d3.min(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        }), 
-            d3.max(data, function (d) {
-                return d["Estimated hesitant or unsure"];
-        })]).range([0, 100]);
-    svg.selectAll("circle")
-        .transition().duration(1000)
-        .style("fill", function (d) {
-            {
-                let f = colorScale2(d["Estimated hesitant or unsure"])
-                if (f <= 33) {
-                    return colorScale(d["Estimated hesitant or unsure"]);
-                }
-                else {
-                    return "lightgray";
-                }
-            }
-        })
-        .transition().duration(1000)
-        .attr("r", function (d){
-            {
-                let f = colorScale2(d["Estimated hesitant or unsure"])
-                if (f <= 33) {
-                    return 2;
-                }
-                else {
-                    return 0;
-                }
-            }
-        });
-
-        bestFitExists = false;
-        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
-}
-
-function lineOfBestFit() {
-
-    if (isVeryHes) {
+//if the graph is currently a pie chart, turn it back into a line graph
+//if not, fill in the colors
+function fillDotAndLine() {
+    if(isPie) {
         drawScatterPlot();
         setTimeout(() =>{fillDotColors()}, "1000");
-        //setTimeout(() =>{lineOfBestFit()}, "1000");
-        isVeryHes = false;
+        setTimeout(() =>{lineOfBestFit()}, "1000");
+    }
+    else {
+        //drawScatterPlot();
+        setTimeout(() =>{fillDotColors()}, "500");
+        setTimeout(() =>{lineOfBestFit()}, "500");
     }
     
-    data = vaccineHesData;
-    var lineGen = d3.regressionLinear()
-        .x(d => d["Social Vulnerability Index (SVI)"])
-        .y(d => d["Percent adults fully vaccinated against COVID-19 (as of 6/10/21)"])
-        .domain([0, 1]);
-
-        var pointX1 = (chartWidth)*(lineGen(data)[0][0]);
-        var pointX2 = (chartWidth+10)*(lineGen(data)[1][0]);
-
-        var pointY1 = chartHeight*(lineGen(data)[1][1]);
-        var pointY2 = chartHeight*(lineGen(data)[0][1]);
-
-    chart.append("line")
-            .transition()
-            .duration(1000)
-            .attr("x1", pointX1)
-            .attr("x2", pointX2)
-            .attr("y1", pointY1)
-            .attr("y2", pointY2)
-            .attr("class", "bestFitLine")
-            .attr("stroke", "darkslateblue")
-            .attr("stroke-width", "2px")
-            .attr("transform", `translate(10, 75)`);
-    
-    bestFitExists = true;
 }
 
+//FUNCTIONS THAT MANIPULATE THE SVGS
+
+//initialize the SVG
+function initializeSVG() {
+    svg.attr("width", width);
+    svg.attr("height", height);
+
+    svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+
+    const margin = { top: 30, right: 30, bottom: 50, left: 50 };
+    //chartWidth = width - margin.left - margin.right;
+    //chartHeight = height - margin.top - margin.bottom;
+
+    chart = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    xScale = d3.scaleBand()
+        .domain([])
+        .range([0, chartWidth])
+        .padding(0.1);
+
+    yScale = d3.scaleLinear()
+        .domain([])
+        .nice()
+        .range([chartHeight, 0]);
+
+    //title
+    svg.append("text")
+        .attr("id", "chart-title")
+        .attr("x", width / 2)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .style("font", "20px times")
+        .style("fill", "darkslateblue")
+        .text("");
+}
+
+async function initialize() {
+    await loadData();
+    initializeSVG();
+    drawKeyframe(keyframeIndex);
+}
+
+//create or update the dot plot
 function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
 
     //margin
@@ -474,14 +265,11 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
     chartWidth = (width - margin.left) - margin.right;
     chartHeight = (height - margin.top) - margin.bottom -100;
 
-    //svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
-    
     if (isPie) {   
         isPie = false; 
         svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
         initializeSVG();
     }
-
 
     //define x and y scales
     xScale = d3.scaleLinear()
@@ -572,11 +360,323 @@ function updateDotPlot(data, title = "", xTitle = "", yTitle = "") {
 
 }
 
+//fill in the dot colors in the scatterplot
+function fillDotColors() {
+    data = vaccineHesData;
+    
+    //use viridis as a color scale based on the min/max values of 'estimated hesitant or unsure'
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            })]).interpolator(d3.interpolateViridis);
+    
+            //select all the scatterplot dots
+    svg.selectAll("circle")
+        .transition().duration(1000)
+        .style("fill", function (d) {
+            {
+                return colorScale(d["Estimated hesitant or unsure"]);
+            }
+        })
+        .attr("r", 1.5);
+      
+    //create the scale if it doesn't exist
+    if (!scaleExists) {
+        const defs = svg.append("defs");
+  
+        const linearGradient = defs.append("linearGradient")
+            .attr("id", "linear-gradient");
+        
+        linearGradient.selectAll("stop")
+          .data(colorScale.ticks().map((t, i, n) => ({ offset: `${100*i/n.length}%`, color: colorScale(t) })))
+          .enter().append("stop")
+          .attr("offset", d => d.offset)
+          .attr("stop-color", d => d.color);
+    
+        svg.append("g")
+            .append("rect")
+            .attr("x", 20)
+            .attr("y", 430)
+            .attr("class", "colorLegend")
+            .transition()
+            .duration(1000)
+            .attr("width", width-40)
+            .attr("height", "30px")
+            .style("fill", "url(#linear-gradient)");
+
+        svg.append("text")
+            .transition()
+            .duration(1000)
+            .attr("class", "colorLegend")
+            .attr("text-anchor", "end")
+            .attr("x", 338)
+            .attr("y", chartHeight + 100)
+            .style("font", "15px times")
+            .style("fill", "darkslateblue")
+            .text("Percent of County Hesitant or Unsure of Vaccination");
+
+        svg.append("text")
+            .transition()
+            .duration(1000)
+            .attr("class", "colorLegend")
+            .attr("text-anchor", "end")
+            .attr("x", 60)
+            .attr("y", chartHeight + 160)
+            .style("font", "15px times")
+            .style("fill", "darkslateblue")
+            .text("0.05%");
+        
+        svg.append("text")
+            .transition()
+            .duration(1000)
+            .attr("class", "colorLegend")
+            .attr("text-anchor", "end")
+            .attr("x", 578)
+            .attr("y", chartHeight + 160)
+            .style("font", "15px times")
+            .style("fill", "darkslateblue")
+            .text("32%");
+            
+            scaleExists = true;
+    }
+
+    //remove the line of best fit if the user moves from verse 2 to verse 1
+    if (bestFitExists && keyframeIndex == 1) {
+        bestFitExists = false;
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+    }
+    
+}
+
+//add the trendline to the scatterplot
+function lineOfBestFit() {
+
+    //if moving from verse 4 to 3, reset the colors
+    if (isVeryHes) {
+        drawScatterPlot();
+        setTimeout(() =>{fillDotColors()}, "1000");
+        isVeryHes = false;
+    }
+    
+    //find the x and y of the line
+    data = vaccineHesData;
+    var lineGen = d3.regressionLinear()
+        .x(d => d["Social Vulnerability Index (SVI)"])
+        .y(d => d["Percent adults fully vaccinated against COVID-19 (as of 6/10/21)"])
+        .domain([0, 1]);
+
+        var pointX1 = (chartWidth)*(lineGen(data)[0][0]);
+        var pointX2 = (chartWidth+10)*(lineGen(data)[1][0]);
+
+        var pointY1 = chartHeight*(lineGen(data)[1][1]);
+        var pointY2 = chartHeight*(lineGen(data)[0][1]);
+
+    //append the line to the scatterplot
+    chart.append("line")
+            .transition()
+            .duration(1000)
+            .attr("x1", pointX1)
+            .attr("x2", pointX2)
+            .attr("y1", pointY1)
+            .attr("y2", pointY2)
+            .attr("class", "bestFitLine")
+            .attr("stroke", "darkslateblue")
+            .attr("stroke-width", "2px")
+            .attr("transform", `translate(10, 75)`);
+    
+    bestFitExists = true;
+}
+
+//highlight the datapoints that are MOST vaccine hesitant
+function fillVeryHesitant() {
+    data = vaccineHesData;
+    //make sure that the new data group has the same color scale as the old one
+    //(so the colors are the same)
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            })]).interpolator(d3.interpolateViridis);
+    
+    //set the range of the second scale to 0-100
+    //this way the value can be used to find the top 1/3 of values
+    var colorScale2 = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            })]).range([0, 100]);
+    
+    //gray out all dots in the bottom 66% (roughly 2/3)
+    //that way only the most hesitant 1/3 are in viridis
+    //then, make the top 1/3 of dots slightly larger
+    svg.selectAll("circle")
+        .transition().duration(1000)
+        .style("fill", function (d) {
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f >= 66) {
+                    return colorScale(d["Estimated hesitant or unsure"]);
+                }
+                else {
+                    return "lightgray";
+                }
+            }
+        })
+        .transition().duration(1000)
+        .attr("r", function (d){
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f >= 66) {
+                    return 2;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+
+        //remove the best fit line
+        isVeryHes = true;
+        bestFitExists = false;
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+}
+
+/*
+//highlight the datapoints that are in the middle 1/3 of vaccine hesitant
+function fillModHesitant() {
+    data = vaccineHesData;
+    //make sure that the new data group has the same color scale as the old one
+    //(so the colors are the same)
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            })]).interpolator(d3.interpolateViridis);
+
+    //set the range of the second scale to 0-100
+    //this way the value can be used to find the middle 1/3 of values
+    var colorScale2 = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            })]).range([0, 100]);
+
+    //gray out all dots in the top 33% and bottom 33%
+    //that way only the moderately hesitant 1/3 are in viridis
+    //then, make the middle 1/3 of dots slightly larger
+    svg.selectAll("circle")
+        .style("fill", function (d) {
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f < 66 && f > 33) {
+                    return colorScale(d["Estimated hesitant or unsure"]);
+                }
+                else {
+                    return "lightgray";
+                }
+            }
+        })
+        .attr("r", function (d){
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f < 66 && f > 33) {
+                    return 2;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+
+        bestFitExists = false;
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+}
+*/
+
+//highlight the datapoints that are LEAST vaccine hesitant
+function fillLowHesitant() {
+    data = vaccineHesData;
+    
+    //make sure that the new data group has the same color scale as the old one
+    //(so the colors are the same)
+    var colorScale = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            })]).interpolator(d3.interpolateViridis);
+
+    //set the range of the second scale to 0-100
+    //this way the value can be used to find the bottom 1/3 of values
+    var colorScale2 = d3.scaleSequential()
+        .domain([
+            d3.min(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            }), 
+            d3.max(data, function (d) {
+                return d["Estimated hesitant or unsure"];
+            })]).range([0, 100]);
+
+    //gray out all dots in the top 66% (roughly 2/3)
+    //that way only the least hesitant 1/3 are in viridis
+    //then, make the bottom 1/3 of dots slightly larger
+    svg.selectAll("circle")
+        .transition().duration(1000)
+        .style("fill", function (d) {
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f <= 33) {
+                    return colorScale(d["Estimated hesitant or unsure"]);
+                }
+                else {
+                    return "lightgray";
+                }
+            }
+        })
+        .transition().duration(1000)
+        .attr("r", function (d){
+            {
+                let f = colorScale2(d["Estimated hesitant or unsure"])
+                if (f <= 33) {
+                    return 2;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+
+        //remove the line of best fit
+        bestFitExists = false;
+        svg.selectAll(".bestFitLine").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
+}
+
+//helper function that delays the clearing of the SVG and generation of the pie chart
+//reduces animation bugs and removes the scatterplot
 function makeItAPie(data, title = "") {
     setTimeout(() =>{makePie(data, title)}, "1000");
     svg.selectAll("*").transition().attr("transform", "translate(0, 1000)").duration(900).remove();
 }
 
+//creates the pie chart
 function makePie(data, title = "") {
 
     // Define the margin so that there is space around the vis for axes and labels
@@ -585,20 +685,22 @@ function makePie(data, title = "") {
     let chartHeight2 = height - margin.top - margin.bottom;
     var radius = (Math.min(chartWidth1, chartHeight2)-40) / 2;
 
-    // Create a 'group' variable to hold the chart, these are used to keep similar items together in d3/with svgs
+    // Create a 'group' variable to hold the chart
     let chart = svg.append("g")
         .attr("transform", "translate(" + (width/2 +40) + "," + 250 + ")");
 
+    //grab pie data
     var pie = d3.pie()
         .value(function(d) {
             return d.Count;
         });
       const pieData = pie(data, d => d.Motive);
      
-      
+    //create color scale
     var colorScale = d3.scaleSequential()
       .domain([0, 8]).interpolator(d3.interpolateViridis);
 
+    //fill in colors
     chart.selectAll('slices')
         .data(pieData)
         .join('path')
@@ -615,6 +717,7 @@ function makePie(data, title = "") {
 
     pos = 215+100;
     pos2 = 20;
+
     //legend
     for (i = 0; i < counts.length; i++) {
         svg.append("circle")
@@ -656,7 +759,7 @@ function makePie(data, title = "") {
         .style("font", "12px times")
         .style("fill", "white");
 
-    // Add title
+    //title
     svg.append("text")
         .transition()
         .duration(2000)
@@ -673,46 +776,5 @@ function makePie(data, title = "") {
     scaleExists = false;
 }
 
-function initializeSVG() {
-    svg.attr("width", width);
-    svg.attr("height", height);
-
-    svg.selectAll("*").transition().duration(1000).attr("transform", "translate(0, 1000)").remove();
-
-    const margin = { top: 30, right: 30, bottom: 50, left: 50 };
-    //chartWidth = width - margin.left - margin.right;
-    //chartHeight = height - margin.top - margin.bottom;
-
-    chart = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    
-    xScale = d3.scaleBand()
-        .domain([])
-        .range([0, chartWidth])
-        .padding(0.1);
-
-    yScale = d3.scaleLinear()
-        .domain([])
-        .nice()
-        .range([chartHeight, 0]);
-    
-
-    // Add title
-    svg.append("text")
-        .attr("id", "chart-title")
-        .attr("x", width / 2)
-        .attr("y", 30)
-        .attr("text-anchor", "middle")
-        .style("font", "20px times")
-        .style("fill", "darkslateblue")
-        .text("");
-}
-
-async function initialize() {
-    await loadData();
-    initializeSVG();
-    drawKeyframe(keyframeIndex);
-}
-
+//initialize the SVG!
 initialize();
