@@ -518,7 +518,7 @@ function fillVeryHesitant() {
     
     //gray out all dots in the bottom 66% (roughly 2/3)
     //that way only the most hesitant 1/3 are in viridis
-    //then, make the top 1/3 of dots slightly larger
+    //then, make the top 1/3 of dots slightly larger and bottom 2/3 dots disappear
     svg.selectAll("circle")
         .transition().duration(1000)
         .style("fill", function (d) {
@@ -579,7 +579,7 @@ function fillModHesitant() {
 
     //gray out all dots in the top 33% and bottom 33%
     //that way only the moderately hesitant 1/3 are in viridis
-    //then, make the middle 1/3 of dots slightly larger
+    //then, make the middle 1/3 of dots slightly larger and top/bottom 2/3 dots disappear
     svg.selectAll("circle")
         .style("fill", function (d) {
             {
@@ -637,7 +637,7 @@ function fillLowHesitant() {
 
     //gray out all dots in the top 66% (roughly 2/3)
     //that way only the least hesitant 1/3 are in viridis
-    //then, make the bottom 1/3 of dots slightly larger
+    //then, make the bottom 1/3 of dots slightly larger and top 2/3 dots disappear
     svg.selectAll("circle")
         .transition().duration(1000)
         .style("fill", function (d) {
@@ -713,7 +713,7 @@ function makePie(data, title = "") {
         });
 
     motives = ["Fear", "Politics", "Downplay Severity", "Other", "False Hope", "Profit", "Help", "Undermine Target Country"]; //data.value(function(d) { return d.Motive });
-    counts = [230, 177, 92, 87, 52, 37, 21, 21]; //data.value(function(d) { return d.Count });
+    counts = [230, 177, 92, 87, 52, 37, 21, 21];
 
     pos = 215+100;
     pos2 = 20;
